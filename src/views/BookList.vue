@@ -37,17 +37,33 @@ export default {
     },
     mounted: function() {
         axios.get('http://localhost:8080/book/list', {withCredentials: true}).then(function(response) {
-            // console.log(toString.call(response.data))
+            console.log("----- success -----")
+            console.log(response)
             this.dataAry = response.data.book_list
             this.dataAry.forEach(data => {
-                if (data.is_rental) {
+                if (!data.is_rental) {
                     data.rentalStatus = "貸出可"
                 } else {
                     data.rentalStatus = "貸出不可"
                 }
             });
-            console.log(this.dataAry)
-        }.bind(this))
+        }.bind(this)).catch( error => {
+            console.log("----- error -----")
+            if (error.response) {
+                console.log("----- response -----")
+                console.log(error.response.data)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            } else if (error.request) {
+                console.log("----- request -----")
+                console.log("error: request")
+            } else {
+                console.log("----- else -----")
+                console.log('Error', error.message)
+            }
+            console.log("----- config -----")
+            console.log(error.config)
+        })
     },
     methods: {
         deleteRecord(event) {

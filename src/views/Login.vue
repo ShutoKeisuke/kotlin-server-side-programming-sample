@@ -19,18 +19,11 @@ export default {
     },
     methods: {
         login() {
-            const axiosConfig = {
-                headers: {
-                    "Cookie": document.cookie
-                }
-            }
-            axios.defaults.withCredentials = true
-
             var params = new URLSearchParams()
             params.append('email', this.email)
             params.append('pass', this.pass)
 
-            axios.post('http://localhost:8080/login', params, axiosConfig)
+            axios.post('http://localhost:8080/login', params)
                 .then(function(response) {
                     console.log('----- success ------')
                     console.log(response)

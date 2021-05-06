@@ -18,8 +18,8 @@
             </tbody>
         </table>
         <router-link :to="{name: 'adminUpdate', params: {id: dataObj.id}}">更新</router-link><br>
-        <a href="">削除</a><br>
-        <a  v-if="dataObj.rental_info === null" href="#">貸出</a><br>
+        <a href="#" @click.prevent="deleteRecord">削除</a><br>
+        <a  v-if="dataObj.rental_info === null" href="#" @click.prevent="rentalThisBook" >貸出</a><br>
         <div v-if="dataObj.rental_info !== null">
             <h3>貸出情報</h3>
         <table>
@@ -42,7 +42,6 @@
         </div>
         <br>
         <router-link to="/book/list">一覧へ戻る</router-link>
-        <p>{{ $data }}</p>
     </div>
 </template>
 
@@ -63,6 +62,69 @@ export default {
                 this.dataObj = response.data
                 this.rentalInfo = this.dataObj.rental_info
             })
+    },
+    methods: {
+        deleteRecord() {
+            if (confirm(`書籍ID: ${this.dataObj.id} の書籍を削除しますか?`)) {
+                axios.delete(`http://localhost:8080/admin/book/delete/${this.dataObj.id}`, {withCredentials: true})
+                .then( function(response) {
+                    console.log("----- success -----")
+                    console.log(response)
+                    this.$router.push('/admin/book/delete/completed')
+                    return response.data.token
+                }.bind(this) ).catch( error => {
+                    console.log("----- error -----")
+                alert("書籍は存在しません")
+                if (error.response) {
+                    console.log("----- response -----")
+                    console.log(error.response.data)
+                    console.log(error.response.status)
+                    console.log(error.response.headers)
+                } else if (error.request) {
+                    console.log("----- request -----")
+                    console.log("error: request")
+                } else {
+                    console.log("----- else -----")
+                    console.log('Error', error.message)
+                }
+                console.log("----- config -----")
+                console.log(error.config)
+                } )
+            }
+            
+        },
+        rentalThisBook() {
+            console.log("----- method rental was called -----")
+            if(confirm("この本を借りますか？")){
+                axios.post("http://localhost:8080/rental/start",
+                        {book_id: this.dataObj.id},
+                        {withCredentials: true})
+                .then(function(response) {
+                    console.log("----- success -----")
+                    console.log(response)
+                    this.$router.go({path: this.$router.currentRoute.path, force: true})
+                }.bind(this))
+                .catch(error => {
+                    console.log("----- error -----")
+                    alert("アプリケーションがバグってる可能性が...")
+                    if (error.response) {
+                        console.log("----- response -----")
+                        console.log(error.response.data)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    } else if (error.request) {
+                        console.log("----- request -----")
+                        console.log("error: request")
+                    } else {
+                        console.log("----- else -----")
+                        console.log('Error', error.message)
+                    }
+                    console.log("----- config -----")
+                    console.log(error.config)
+                })
+            }
+            
+        }
     }
 }
 </script>
